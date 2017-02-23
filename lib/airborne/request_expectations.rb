@@ -8,6 +8,8 @@ module Airborne
     include RSpec
     include PathMatcher
 
+    INT_KLASSES = 0.class == Integer ? [Integer] : [Fixnum, Bignum]
+
     def expect_json_types(*args)
       call_with_path(args) do |param, body|
         expect_json_types_impl(param, body)
@@ -231,17 +233,17 @@ module Airborne
     end
 
     def property?(expectations)
-      [String, Regexp, Float, Fixnum, Bignum, TrueClass, FalseClass, NilClass, Array].include?(expectations.class)
+      [String, Regexp, Float, TrueClass, FalseClass, NilClass, Array, *INT_KLASSES].include?(expectations.class)
     end
 
     def get_mapper
       base_mapper = {
-        integer: [Fixnum, Bignum],
-        array_of_integers: [Fixnum, Bignum],
-        int: [Fixnum, Bignum],
-        array_of_ints: [Fixnum, Bignum],
-        float: [Float, Fixnum, Bignum],
-        array_of_floats: [Float, Fixnum, Bignum],
+        integer: INT_KLASSES,
+        array_of_integers: INT_KLASSES,
+        int: INT_KLASSES,
+        array_of_ints: INT_KLASSES,
+        float: [Float, *INT_KLASSES],
+        array_of_floats: [Float, *INT_KLASSES],
         string: [String],
         array_of_strings: [String],
         boolean: [TrueClass, FalseClass],
@@ -267,7 +269,7 @@ module Airborne
       candidate = Rack::Utils::SYMBOL_TO_STATUS_CODE[candidate] if candidate.is_a?(Symbol)
       case authority
       when String then candidate.to_s
-      when Fixnum then candidate.to_i
+      when *INT_KLASSES then candidate.to_i
       else candidate
       end
     end
@@ -283,5 +285,7 @@ module Airborne
     def match_expected?
       Airborne.configuration.match_expected?
     end
+
+
   end
 end

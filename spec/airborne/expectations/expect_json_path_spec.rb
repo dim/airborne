@@ -92,7 +92,7 @@ describe 'expect_json with path' do
     expect_json('address.coordinates.lattitude', 33.3872)
   end
 
-  it 'should allow integers (Fixnum, Bignum) to be tested against a path' do
+  it 'should allow integers to be tested against a path' do
     mock_get('simple_get')
     get '/simple_get'
     expect_json('age', 32)
